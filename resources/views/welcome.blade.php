@@ -201,9 +201,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('houses.index') }}">Daftar Rumah</a>
-                    </li>
+                   
                     @auth
                         @if (Auth::user()->role === 'agent')
                             <li class="nav-item">
@@ -281,35 +279,47 @@
         <div class="container">
             <h2 class="text-center mb-5" style="color: #1e3a8a; font-weight: 700;">Properti Unggulan</h2>
             <div class="row" id="propertiesList">
-    @if (isset($featuredHouses) && $featuredHouses->isNotEmpty())
-        @foreach ($featuredHouses as $house)
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card property-card">
-                    @if ($house->photo_path)
-                        <img src="{{ Storage::url($house->photo_path) }}" class="card-img-top" alt="{{ $house->title }}">
-                    @else
-                        <img src="https://via.placeholder.com/300x220?text={{ urlencode($house->title) }}" class="card-img-top" alt="Placeholder">
-                    @endif
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $house->title }}</h5>
-                        <p class="card-text"><i class="bi bi-currency-dollar"></i><strong>Harga:</strong> Rp {{ number_format($house->price, 0, ',', '.') }}</p>
-                        <p class="card-text"><i class="bi bi-house-door"></i><strong>Status:</strong> {{ $house->status }}</p>
-                        <p class="card-text"><i class="bi bi-person"></i><strong>Agen:</strong> {{ $house->agent->name ?? 'Tidak diketahui' }}</p>
-                        @if (auth()->check() && auth()->user()->role === 'buyer')
-                            <a href="{{ route('buyer.show', $house->id) }}" class="btn btn-primary btn-sm">Lihat Detail</a>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login untuk Detail</a>
-                        @endif
+                @if (isset($featuredHouses) && $featuredHouses->isNotEmpty())
+                    @foreach ($featuredHouses as $house)
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card property-card">
+                                @php
+                                    // Hapus prefiks 'public/' dan pastikan tidak ada '/' di awal
+                                    $pathToCheck = ltrim(str_replace('public/', '', $house->photo_path), '/');
+                                    $fileExists = Storage::disk('public')->exists($pathToCheck);
+                                    $imageUrl = $fileExists ? Storage::url($pathToCheck) : null;
+                                    // Debugging sementara
+                                    $originalPath = $house->photo_path;
+                                @endphp
+                                @if ($imageUrl)
+                                    <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $house->title }}">
+                                @else
+                                    <img src="https://via.placeholder.com/300x220?text={{ urlencode('Gambar Tidak Tersedia: ' . $house->title) }}" class="card-img-top" alt="Gambar tidak tersedia">
+                                    <!-- Debugging sementara -->
+                                    <p style="font-size: 0.75rem; color: #666;">Path: {{ $originalPath }}</p>
+                                    <p style="font-size: 0.75rem; color: #666;">Path checked: {{ $pathToCheck }}</p>
+                                    <p style="font-size: 0.75rem; color: #666;">File exists: {{ $fileExists ? 'Yes' : 'No' }}</p>
+                                @endif
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $house->title }}</h5>
+                                    <p class="card-text"><i class="bi bi-currency-dollar"></i><strong>Harga:</strong> Rp {{ number_format($house->price, 0, ',', '.') }}</p>
+                                    <p class="card-text"><i class="bi bi-house-door"></i><strong>Status:</strong> {{ $house->status }}</p>
+                                    <p class="card-text"><i class="bi bi-person"></i><strong>Agen:</strong> {{ $house->agent->name ?? 'Tidak diketahui' }}</p>
+                                    @if (auth()->check() && auth()->user()->role === 'buyer')
+                                        <a href="{{ route('buyer.show', $house->id) }}" class="btn btn-primary btn-sm">Lihat Detail</a>
+                                    @else
+                                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login untuk Detail</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Belum ada properti yang tersedia saat ini.</p>
                     </div>
-                </div>
+                @endif
             </div>
-        @endforeach
-    @else
-        <div class="col-12 text-center">
-            <p class="text-muted">Belum ada properti yang tersedia saat ini.</p>
-        </div>
-    @endif
-</div>
         </div>
     </section>
 
