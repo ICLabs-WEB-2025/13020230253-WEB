@@ -6,7 +6,8 @@
     <title>Dashboard Pembeli - PropertyApp</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> <style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
         :root {
             --primary: #5A67D8; /* Biru keunguan yang lebih lembut */
             --primary-dark: #434190; /* Warna gelap untuk kontras */
@@ -384,7 +385,8 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid"> <a class="navbar-brand" href="{{ route('buyer.index') }}">PropertyApp</a>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ route('buyer.index') }}">PropertyApp</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -424,20 +426,26 @@
         <h2 class="text-center">Temukan Rumah Impian Anda</h2>
         <p class="text-center text-muted mb-5">Jelajahi properti terbaik yang tersedia untuk Anda.</p>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> @forelse ($houses as $house)
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @forelse ($houses as $house)
                 <div class="col">
                     <div class="card h-100">
-                        @if ($house->photo_path)
-                            <img src="{{ Storage::url($house->photo_path) }}" class="card-img-top" alt="{{ $house->title }}">
-                        @else
-                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-muted" style="height: 220px;">
-                                <i class="bi bi-image-fill me-2" style="font-size: 1.5rem;"></i>
-                                <span>Tidak Ada Foto</span>
-                            </div>
-                        @endif
+                        @php
+                            // Membersihkan jalur dengan menghapus 'public/' dan tanda '/' awal
+                            $pathToCheck = ltrim(str_replace('public/', '', $house->photo_path), '/');
+                            // Memeriksa apakah file ada di storage
+                            $fileExists = $house->photo_path ? Storage::disk('public')->exists($pathToCheck) : false;
+                            // Menentukan URL gambar: gunakan file jika ada, atau placeholder jika tidak
+                            $imageUrl = $fileExists ? Storage::url($pathToCheck) : 'https://via.placeholder.com/400x220?text=Gambar+Tidak+Tersedia';
+                        @endphp
+                        <img src="{{ $imageUrl }}"
+                             class="card-img-top"
+                             alt="{{ $house->title }}"
+                             loading="lazy">
                         <div class="card-body d-flex flex-column">
                             <div class="flex-grow-1">
-                                <h5 class="card-title">{{ Str::limit($house->title, 40) }}</h5> <p class="card-text"><strong>Harga:</strong> Rp {{ number_format($house->price, 0, ',', '.') }}</p>
+                                <h5 class="card-title">{{ Str::limit($house->title, 40) }}</h5>
+                                <p class="card-text"><strong>Harga:</strong> Rp {{ number_format($house->price, 0, ',', '.') }}</p>
                                 <p class="card-text">
                                     <strong>Status:</strong>
                                     <span class="badge-status status-{{ Str::slug($house->status) }}">
@@ -446,7 +454,8 @@
                                 </p>
                                 <p class="card-text"><strong>Agen:</strong> {{ Str::limit($house->agent->name, 25) }}</p>
                             </div>
-                            <div class="mt-4 d-flex justify-content-between"> <a href="{{ route('buyer.show', $house->id) }}" class="btn btn-outline-primary btn-action">Lihat Detail</a>
+                            <div class="mt-4 d-flex justify-content-between">
+                                <a href="{{ route('buyer.show', $house->id) }}" class="btn btn-outline-primary btn-action">Lihat Detail</a>
                                 <a href="{{ route('buyer.request', $house->id) }}" class="btn btn-buy btn-action">Ajukan Penawaran</a>
                             </div>
                         </div>
