@@ -6,66 +6,69 @@ use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\Admin\AgentApplicationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HouseController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
+use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
-// --------------------
-// RUTE PUBLIK
-// --------------------
+/*
+ * Public Routes
+ */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
 
-// --------------------
-// RUTE AUTENTIKASI (GUEST)
-// --------------------
+/*
+ * Guest Routes
+ */
 Route::middleware('guest')->group(function () {
-    // Ganti sesuai autentikasi yang kamu pakai (Breeze, Fortify, atau manual)
-    Route::get('/login', [App\Http\Controllers\LoginController::class, 'create'])->name('login');
-    Route::post('/login', [App\Http\Controllers\LoginController::class, 'store']);
-    
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store']);
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store']);
 });
 
-// --------------------
-// RUTE AUTENTIKASI (AUTH)
-// --------------------
+/*
+ * Authenticated Routes
+ */
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [App\Http\Controllers\LoginController::class, 'destroy'])->name('logout');
+    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    // --------------------
-    // BUYER ROUTES
-    // --------------------
+    /*
+     * Buyer Routes
+     */
     Route::middleware('role:buyer')->prefix('buyer')->name('buyer.')->group(function () {
         Route::get('/', [BuyerController::class, 'index'])->name('index');
         Route::get('/houses/{house}', [BuyerController::class, 'show'])->name('show');
         Route::post('/request/{house}', [BuyerController::class, 'requestPurchase'])->name('request');
         Route::get('/offers', [BuyerController::class, 'offers'])->name('offers');
         Route::delete('/offers/{offer}', [BuyerController::class, 'cancel'])->name('cancel');
+        Route::post('/send-message', [BuyerController::class, 'sendMessage'])->name('sendMessage');
     });
 
-    // --------------------
-    // AGENT ROUTES
-    // --------------------
+    /*
+     * Agent Routes
+     */
     Route::middleware('role:agent')->prefix('agent')->name('agent.')->group(function () {
         Route::get('/listings', [AgentController::class, 'index'])->name('index');
         Route::get('/houses/create', [AgentController::class, 'create'])->name('create');
         Route::post('/houses', [AgentController::class, 'store'])->name('store');
         Route::get('/houses/{house}/edit', [AgentController::class, 'edit'])->name('edit');
         Route::put('/houses/{house}', [AgentController::class, 'update'])->name('update');
-        Route::delete('/houses/{house}', [AgentController::class, 'destroy'])->name('destroy'); // ✅ PENTING
+        Route::delete('/houses/{house}', [AgentController::class, 'destroy'])->name('destroy');
         Route::get('/requests', [AgentController::class, 'requests'])->name('requests');
         Route::post('/offers/{offer}/approve', [AgentController::class, 'approveOffer'])->name('approve');
         Route::post('/offers/{offer}/reject', [AgentController::class, 'rejectOffer'])->name('reject');
+        Route::get('/conversations', [AgentController::class, 'getConversations'])->name('conversations');
+        Route::get('/chat/messages/{conversation}', [AgentController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/chat/send/{conversation}', [AgentController::class, 'sendMessage'])->name('chat.send');
     });
 
-    // --------------------
-    // ADMIN ROUTES
-    // --------------------
+    /*
+     * Admin Routes
+     */
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/applications', [AgentApplicationController::class, 'index'])->name('agent.applications');
         Route::post('/applications/{id}/approve', [AgentApplicationController::class, 'approve'])->name('agent.approve');
         Route::post('/applications/{id}/reject', [AgentApplicationController::class, 'reject'])->name('agent.reject');
     });
 });
+
+?>

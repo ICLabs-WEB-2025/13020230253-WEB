@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\House;
 use App\Models\Offer;
+use App\Models\Conversation;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +20,15 @@ class BuyerController extends Controller
             })
             ->get();
 
-        return view('buyer.index', compact('houses'));
+        // Ambil riwayat pesan jika ada conversationId di session
+        $messages = [];
+        if (session('conversationId')) {
+            $messages = Message::where('conversation_id', session('conversationId'))
+                ->orderBy('created_at', 'asc')
+                ->get();
+        }
+
+        return view('buyer.index', compact('houses', 'messages'));
     }
 
     public function show($id)
@@ -30,19 +40,57 @@ class BuyerController extends Controller
         return view('buyer.show', compact('house'));
     }
 
-    public function requestPurchase($id)
+    public function requestPurchase(Request $request, $id)
     {
         $house = House::findOrFail($id);
+        if ($house->status !== 'Tersedia') {
+            return redirect()->route('buyer.index')->with('error', 'Rumah ini tidak tersedia.');
+        }
+
         if (Auth::check() && Auth::user()->role === 'buyer') {
-            // Buat penawaran baru (contoh sederhana)
+            $buyerId = Auth::id();
+            $agentId = $house->agent_id;
+
+            // Buat atau cari percakapan
+            $conversation = Conversation::firstOrCreate(
+                [
+                    'buyer_id' => $buyerId,
+                    'agent_id' => $agentId,
+                    'house_id' => $house->id,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            // Buat pesan awal
+            $messageText = "Saya tertarik dengan {$house->title}. Bisakah kita membahas lebih lanjut?";
+            Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $buyerId,
+                'sender_type' => 'buyer',
+                'message_text' => $messageText,
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Buat penawaran (mempertahankan logika asli)
             Offer::create([
                 'house_id' => $house->id,
-                'buyer_id' => Auth::id(),
-                'offer_price' => $house->price, // Harga awal sama dengan harga rumah
+                'buyer_id' => $buyerId,
+                'offer_price' => $house->price,
                 'status' => 'Tertunda',
             ]);
-            return redirect()->route('buyer.index')->with('success', 'Permintaan pembelian untuk ' . $house->title . ' telah dikirim ke agen.');
+
+            return redirect()->route('buyer.index')->with([
+                'success' => 'Permintaan pembelian untuk ' . $house->title . ' telah dikirim ke agen.',
+                'openChat' => true,
+                'conversationId' => $conversation->id,
+            ]);
         }
+
         return redirect()->route('login')->with('error', 'Anda harus login sebagai buyer.');
     }
 
@@ -76,5 +124,34 @@ class BuyerController extends Controller
 
         $offer->delete();
         return redirect()->route('buyer.offers')->with('success', 'Penawaran berhasil dibatalkan.');
+    }
+
+    public function sendMessage(Request $request)
+    {
+        $request->validate([
+            'conversation_id' => 'required|exists:conversations,id',
+            'message_text' => 'required|string|max:1000',
+        ]);
+
+        $conversation = Conversation::findOrFail($request->conversation_id);
+        if ($conversation->buyer_id !== Auth::id()) {
+            return redirect()->route('buyer.index')->with('error', 'Akses ditolak.');
+        }
+
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => Auth::id(),
+            'sender_type' => 'buyer',
+            'message_text' => $request->message_text,
+            'is_read' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('buyer.index')->with([
+            'success' => 'Pesan terkirim.',
+            'openChat' => true,
+            'conversationId' => $conversation->id,
+        ]);
     }
 }

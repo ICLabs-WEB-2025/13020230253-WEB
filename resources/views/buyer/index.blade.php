@@ -4,28 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Pembeli - PropertyApp</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary: #5A67D8; /* Biru keunguan yang lebih lembut */
-            --primary-dark: #434190; /* Warna gelap untuk kontras */
-            --primary-light: #C3DAFE; /* Warna terang untuk highlight */
+            --primary: #5A67D8;
+            --primary-dark: #434190;
+            --primary-light: #C3DAFE;
             --secondary: #6B7280;
             --success: #10B981;
-            --info: #38B2AC; /* Warna baru untuk info/status */
-            --warning: #F6AD55; /* Warna untuk status peringatan */
-            --danger: #EF4444; /* Warna untuk kesalahan */
+            --info: #38B2AC;
+            --warning: #F6AD55;
+            --danger: #EF4444;
             --text-primary: #2D3748;
             --text-secondary: #718096;
             --bg-primary: #ffffff;
-            --bg-secondary: #F7FAFC; /* Latar belakang yang lebih terang */
+            --bg-secondary: #F7FAFC;
             --border: #EDF2F7;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            --radius-lg: 1rem; /* Radius sudut yang lebih besar */
+            --radius-lg: 1rem;
             --radius-md: 0.75rem;
         }
 
@@ -33,7 +34,7 @@
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-secondary);
             margin: 0;
-            padding-top: 70px; /* Sesuaikan dengan tinggi navbar baru */
+            padding-top: 70px;
             color: var(--text-primary);
         }
 
@@ -44,7 +45,7 @@
             top: 0;
             width: 100%;
             z-index: 1030;
-            padding: 0.75rem 0; /* Padding navbar */
+            padding: 0.75rem 0;
         }
 
         .navbar-brand {
@@ -68,15 +69,15 @@
         }
 
         .container {
-            padding: 2.5rem 1.5rem; /* Padding lebih besar */
-            max-width: 1300px; /* Lebar maksimum yang sedikit lebih besar */
+            padding: 2.5rem 1.5rem;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
         h2 {
             color: var(--primary-dark);
             font-weight: 700;
-            margin-bottom: 2.5rem; /* Jarak lebih besar */
+            margin-bottom: 2.5rem;
         }
 
         .alert {
@@ -86,7 +87,7 @@
         }
 
         .card {
-            border: 1px solid var(--border); /* Border halus */
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -95,12 +96,12 @@
         }
 
         .card:hover {
-            transform: translateY(-10px); /* Efek hover lebih menonjol */
+            transform: translateY(-10px);
             box-shadow: var(--shadow-lg);
         }
 
         .card-img-top {
-            height: 220px; /* Tinggi gambar sedikit lebih besar */
+            height: 220px;
             object-fit: cover;
             background-color: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
@@ -128,7 +129,7 @@
 
         .btn-action {
             padding: 0.5rem 1.25rem;
-            border-radius: 50px; /* Tombol lebih bulat */
+            border-radius: 50px;
             font-weight: 500;
             text-transform: uppercase;
             font-size: 0.85rem;
@@ -154,7 +155,6 @@
             border-color: var(--primary-dark);
         }
 
-        /* Status Badges */
         .badge-status {
             display: inline-block;
             padding: 0.3em 0.6em;
@@ -164,7 +164,7 @@
             text-align: center;
             white-space: nowrap;
             vertical-align: baseline;
-            border-radius: 0.375rem; /* Rounded corners */
+            border-radius: 0.375rem;
             margin-left: 0.5rem;
         }
 
@@ -176,10 +176,10 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: var(--info); /* Warna chat button yang lebih menarik */
+            background: var(--info);
             color: #fff;
             border-radius: 50%;
-            width: 65px; /* Sedikit lebih besar */
+            width: 65px;
             height: 65px;
             display: flex;
             align-items: center;
@@ -187,20 +187,20 @@
             box-shadow: var(--shadow-md);
             transition: transform 0.3s ease, background-color 0.3s ease;
             z-index: 1040;
-            font-size: 1.8rem; /* Ukuran ikon chat */
+            font-size: 1.8rem;
         }
 
         .chat-btn:hover {
-            transform: scale(1.15); /* Efek hover lebih jelas */
-            background: #2C7A7B; /* Warna hover untuk chat */
+            transform: scale(1.15);
+            background: #2C7A7B;
         }
 
         .chat-box {
             display: none;
             position: fixed;
-            bottom: 110px; /* Sesuaikan posisi di atas tombol chat */
+            bottom: 110px;
             right: 30px;
-            width: 320px; /* Lebar chat box sedikit lebih besar */
+            width: 320px;
             background: var(--bg-primary);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
@@ -208,7 +208,7 @@
             max-height: 450px;
             overflow-y: auto;
             z-index: 1040;
-            animation: fadeIn 0.3s ease-out; /* Animasi muncul */
+            animation: fadeIn 0.3s ease-out;
             border: 1px solid var(--border);
         }
 
@@ -248,7 +248,7 @@
             min-height: 100px;
             max-height: 250px;
             overflow-y: auto;
-            padding-right: 5px; /* Untuk scrollbar */
+            padding-right: 5px;
             margin-bottom: 1rem;
         }
         #chatMessages::-webkit-scrollbar {
@@ -277,8 +277,8 @@
             background: var(--primary-light);
             color: var(--text-primary);
             margin-left: auto;
-            text-align: left; /* Sesuaikan teks kiri untuk pesan sendiri */
-            border-bottom-right-radius: 5px; /* Bentuk gelembung chat */
+            text-align: left;
+            border-bottom-right-radius: 5px;
         }
 
         .message.received {
@@ -286,7 +286,7 @@
             border: 1px solid var(--border);
             color: var(--text-primary);
             margin-right: auto;
-            border-bottom-left-radius: 5px; /* Bentuk gelembung chat */
+            border-bottom-left-radius: 5px;
         }
 
         #chatInput {
@@ -312,27 +312,15 @@
             border-color: #0B9C6B;
         }
 
-        /* Responsive Design */
         @media (max-width: 992px) {
-            .navbar-brand {
-                font-size: 1.3rem;
-            }
-            .nav-link {
-                padding: 0.4rem 0.8rem;
-            }
-            .card-img-top {
-                height: 180px;
-            }
+            .navbar-brand { font-size: 1.3rem; }
+            .nav-link { padding: 0.4rem 0.8rem; }
+            .card-img-top { height: 180px; }
         }
 
         @media (max-width: 768px) {
-            body {
-                padding-top: 56px; /* Lebih kecil untuk navbar mobile */
-            }
-            .navbar-toggler {
-                padding: 0.25rem 0.5rem;
-                font-size: 1rem;
-            }
+            body { padding-top: 56px; }
+            .navbar-toggler { padding: 0.25rem 0.5rem; font-size: 1rem; }
             .navbar-nav {
                 text-align: center;
                 margin-top: 1rem;
@@ -340,46 +328,19 @@
                 border-radius: var(--radius-md);
                 padding: 1rem 0;
             }
-            .nav-item {
-                margin: 0.5rem 0;
-            }
-            .container {
-                padding: 1.5rem 1rem;
-            }
-            .card-img-top {
-                height: 160px;
-            }
-            .chat-box {
-                width: 90%;
-                right: 5%;
-                bottom: 100px;
-            }
-            .chat-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 55px;
-                height: 55px;
-                font-size: 1.5rem;
-            }
+            .nav-item { margin: 0.5rem 0; }
+            .container { padding: 1.5rem 1rem; }
+            .card-img-top { height: 160px; }
+            .chat-box { width: 90%; right: 5%; bottom: 100px; }
+            .chat-btn { bottom: 15px; right: 15px; width: 55px; height: 55px; font-size: 1.5rem; }
         }
 
         @media (max-width: 576px) {
-            .card-img-top {
-                height: 140px;
-            }
-            .card-body {
-                padding: 1rem;
-            }
-            .card-title {
-                font-size: 1.15rem;
-            }
-            .card-text {
-                font-size: 0.9rem;
-            }
-            .btn-action {
-                padding: 0.4rem 1rem;
-                font-size: 0.8rem;
-            }
+            .card-img-top { height: 140px; }
+            .card-body { padding: 1rem; }
+            .card-title { font-size: 1.15rem; }
+            .card-text { font-size: 0.9rem; }
+            .btn-action { padding: 0.4rem 1rem; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -431,11 +392,8 @@
                 <div class="col">
                     <div class="card h-100">
                         @php
-                            // Membersihkan jalur dengan menghapus 'public/' dan tanda '/' awal
                             $pathToCheck = ltrim(str_replace('public/', '', $house->photo_path), '/');
-                            // Memeriksa apakah file ada di storage
                             $fileExists = $house->photo_path ? Storage::disk('public')->exists($pathToCheck) : false;
-                            // Menentukan URL gambar: gunakan file jika ada, atau placeholder jika tidak
                             $imageUrl = $fileExists ? Storage::url($pathToCheck) : 'https://via.placeholder.com/400x220?text=Gambar+Tidak+Tersedia';
                         @endphp
                         <img src="{{ $imageUrl }}"
@@ -456,7 +414,10 @@
                             </div>
                             <div class="mt-4 d-flex justify-content-between">
                                 <a href="{{ route('buyer.show', $house->id) }}" class="btn btn-outline-primary btn-action">Lihat Detail</a>
-                                <a href="{{ route('buyer.request', $house->id) }}" class="btn btn-buy btn-action">Ajukan Penawaran</a>
+                                <form action="{{ route('buyer.request', $house->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-buy btn-action">Ajukan Penawaran</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -481,8 +442,10 @@
             <button class="chat-close-btn" onclick="toggleChat()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div id="chatMessages" class="mb-3"></div>
-        <form id="chatForm" class="chat-form">
-            <input type="text" id="chatInput" class="form-control mb-2" placeholder="Ketik pesan Anda di sini..." required autocomplete="off">
+        <form id="chatForm" class="chat-form" action="{{ route('buyer.sendMessage') }}" method="POST">
+            @csrf
+            <input type="hidden" name="conversation_id" id="conversationId" value="{{ session('conversationId') ?? '' }}">
+            <input type="text" id="chatInput" name="message_text" class="form-control mb-2" placeholder="Ketik pesan Anda di sini..." required autocomplete="off">
             <button type="submit" class="btn btn-success w-100">Kirim Pesan</button>
         </form>
     </div>
@@ -494,39 +457,39 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const chatForm = document.getElementById('chatForm');
+        const conversationIdInput = document.getElementById('conversationId');
+
+        function appendMessage(message, isSentByMe) {
+            const newMessageDiv = document.createElement('div');
+            newMessageDiv.classList.add('message');
+            newMessageDiv.classList.add(isSentByMe ? 'sent' : 'received');
+            newMessageDiv.textContent = message.message_text;
+            chatMessages.appendChild(newMessageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
         function toggleChat() {
             chatVisible = !chatVisible;
             chatBox.classList.toggle('active');
             if (chatVisible) {
-                // Scroll ke bawah saat chat box dibuka
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                chatInput.focus(); // Fokus ke input pesan
+                chatInput.focus();
             }
         }
 
-        chatForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const message = chatInput.value.trim();
-            if (message) {
-                // Tambahkan pesan yang dikirim
-                const newMessage = document.createElement('div');
-                newMessage.classList.add('message', 'sent');
-                newMessage.textContent = message;
-                chatMessages.appendChild(newMessage);
-                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll ke bawah
-                chatInput.value = ''; // Kosongkan input
-
-                // Simulasi pesan balasan dari agen
-                setTimeout(() => {
-                    const reply = document.createElement('div');
-                    reply.classList.add('message', 'received');
-                    reply.innerHTML = '<span style="font-weight: 600; color: var(--primary-dark);">Agen:</span> Terima kasih! Agen akan menghubungi Anda segera melalui email atau telepon. Mohon tunggu balasan kami.';
-                    chatMessages.appendChild(reply);
-                    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll ke bawah
-                }, 1500); // Penundaan sedikit lebih lama
-            }
-        });
+        @if (session('openChat') && session('conversationId'))
+            conversationIdInput.value = {{ session('conversationId') }};
+            toggleChat();
+            @if (session('success'))
+                appendMessage({ message_text: "{{ session('success') }}" }, true);
+            @endif
+            @if (isset($messages) && count($messages) > 0)
+                @foreach ($messages as $message)
+                    appendMessage({
+                        message_text: "{{ $message->message_text }}",
+                    }, {{ $message->sender_type === 'buyer' ? 'true' : 'false' }});
+                @endforeach
+            @endif
+        @endif
     </script>
 </body>
 </html>
