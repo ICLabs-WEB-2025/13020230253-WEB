@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\User; // Pastikan Anda memiliki model User
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -76,7 +77,7 @@ class ChatController extends Controller
 
         // Pastikan user adalah bagian dari percakapan (agen atau pembeli)
         if (! (($user->role === 'buyer' && $conversation->buyer_id === $user->id) ||
-               ($user->role === 'agent' && $conversation->agent_id === $user->id)) ) {
+               ($user->role === 'agent' && $conversation->agent_id === $user->id))) {
             return response()->json(['message' => 'Forbidden. Not authorized to view this conversation.'], 403);
         }
 
@@ -189,7 +190,7 @@ class ChatController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error("Failed to send message from agent: " . $e->getMessage());
+            Log::error("Failed to send message from agent: " . $e->getMessage());
             return response()->json(['message' => 'Failed to send message.', 'error' => $e->getMessage()], 500);
         }
     }
@@ -215,13 +216,11 @@ class ChatController extends Controller
 
         if ($request->filled('conversation_id')) {
             $conversation = Conversation::find($request->input('conversation_id'));
-            if (!$conversation || $conversation->buyer_id !== $user->id) { // Pastikan buyer yang benar
+            if (!$conversation || $conversation->buyer_id !== $user->id) {
                 return response()->json(['message' => 'Conversation not found or not authorized.'], 403);
             }
         } else {
-            // Jika belum ada conversation_id, cari atau buat percakapan baru dengan agen acak/default.
-            // Anda mungkin perlu menambahkan logic untuk memilih agen tertentu (misal: agen properti yang diminati)
-            $agent = User::where('role', 'agent')->first(); // Ambil agen pertama sebagai default
+            $agent = User::where('role', 'agent')->first();
             if (!$agent) {
                 return response()->json(['message' => 'No agent available to chat with.'], 404);
             }
@@ -261,7 +260,7 @@ class ChatController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error("Failed to send message from buyer: " . $e->getMessage());
+            Log::error("Failed to send message from buyer: " . $e->getMessage());
             return response()->json(['message' => 'Failed to send message.', 'error' => $e->getMessage()], 500);
         }
     }

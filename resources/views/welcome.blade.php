@@ -201,7 +201,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Home</a>
                     </li>
-                   
+                    
                     @auth
                         @if (Auth::user()->role === 'agent')
                             <li class="nav-item">
@@ -323,7 +323,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer-section">
         <div class="container text-center">
             <p>© 2025 PropertyApp. All rights reserved.</p>
@@ -336,7 +335,7 @@
         function filterProperties() {
             const search = document.getElementById('search').value;
             const sort = document.getElementById('sort').value;
-            let url = '{{ route('houses.index') }}';
+            let url = "{{ route('houses.index') }}";
             const params = new URLSearchParams();
             if (search) params.append('search', search);
             if (sort) params.append('sort', sort);
