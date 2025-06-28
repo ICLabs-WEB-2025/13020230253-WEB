@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+
 
 class AgentController extends Controller
 {
@@ -342,7 +344,7 @@ class AgentController extends Controller
         ]);
 
         // Update unread_count untuk pembeli
-        $conversation->update(['unread_count' => \DB::raw('unread_count + 1')]);
+        $conversation->update(['unread_count' => DB::raw('unread_count + 1')]);
 
         return response()->json([
             'sent_message' => [

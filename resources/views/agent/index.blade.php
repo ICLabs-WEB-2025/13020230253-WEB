@@ -674,7 +674,7 @@
                 const data = await response.json();
                 selectConversationPrompt.style.display = 'none';
                 data.messages.forEach(msg => {
-                    const isSentByMe = msg.sender_type === 'agent' && msg.sender_id === {{ Auth::id() }};
+                    const isSentByMe = msg.sender_type === 'agent' && msg.sender_id === currentUserId;
                     appendMessage(msg, isSentByMe);
                 });
 
