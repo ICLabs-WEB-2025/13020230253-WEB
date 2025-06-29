@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\ListingController;
 use App\Http\Controllers\Admin\AgentApplicationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
@@ -11,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/houses', [HomeController::class, 'index'])->name('houses.index');
+Route::delete('/agent/listings/{id}', [ListingController::class, 'destroy'])->name('agent.listings.destroy');
+Route::get('/agent/listings', [ListingController::class, 'index'])->name('agent.listings.index');
+
+
+
 
 
 Route::middleware('guest')->group(function () {

@@ -31,11 +31,12 @@
                         <td>
                             <a href="{{ route('agent.edit', $house->id) }}" class="btn btn-sm btn-primary">Edit</a>
 
-                            <form action="{{ route('agent.destroy', $house->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Yakin ingin menghapus rumah ini?')">
+                            <form action="{{ route('agent.listings.destroy', $listing->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                <button type="submit" class="btn btn-danger">Hapus</button>
                             </form>
+
                         </td>
                     </tr>
                 @endforeach

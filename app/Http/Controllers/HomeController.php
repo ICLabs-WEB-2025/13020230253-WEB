@@ -12,8 +12,8 @@ class HomeController extends Controller
     public function index()
     {
         // Jika pengguna sudah login, arahkan berdasarkan peran
-        if (auth()->check()) {
-            $user = auth()->user();
+        if (Auth::check()) {
+            $user = Auth::user();
             switch ($user->role) {
                 case 'admin':
                     return redirect()->route('admin.agent.applications');
@@ -29,7 +29,7 @@ class HomeController extends Controller
             }
         }
 
-        // Ambil 6 rumah tersedia dari semua agen untuk Properti Unggulan
+        // Ambil 6 rumah tersedia untuk Properti Unggulan
         $featuredHouses = House::where('status', 'Tersedia')
             ->orderBy('created_at', 'desc')
             ->take(6)
@@ -42,9 +42,20 @@ class HomeController extends Controller
         return view('welcome', compact('featuredHouses'));
     }
 
-    public function houses()
+    public function houses(Request $request)
     {
-        $houses = House::where('status', 'Tersedia')->get();
-        return view('houses.index', compact('houses'));
+        $search = $request->query('search');
+        $sortBy = $request->query('sort_by', 'created_at');
+        $sortOrder = $request->query('sort_order', 'desc');
+
+        // Ambil rumah dengan paginasi
+        $houses = House::where('status', 'Tersedia')
+            ->when($search, function ($query, $search) {
+                return $query->where('title', 'like', '%' . $search . '%');
+            })
+            ->orderBy($sortBy, $sortOrder)
+            ->paginate(9); // Paginasi, 9 item per halaman
+
+        return view('houses.index', compact('houses', 'search', 'sortBy', 'sortOrder'));
     }
 }

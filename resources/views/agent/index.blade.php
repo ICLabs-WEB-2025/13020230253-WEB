@@ -1,312 +1,351 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Rumah Agen')
+@section('title', 'Dasbor Agen Properti')
 
 @section('styles')
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
-            --primary: #5A67D8;
-            --primary-dark: #434190;
-            --primary-light: #C3DAFE;
-            --secondary: #6B7280;
-            --success: #10B981;
-            --info: #38B2AC;
-            --warning: #F6AD55;
-            --danger: #EF4444;
-            --text-primary: #2D3748;
-            --text-secondary: #718096;
-            --bg-primary: #ffffff;
-            --bg-secondary: #F7FAFC;
-            --border: #EDF2F7;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            --radius-lg: 1rem;
-            --radius-md: 0.75rem;
+            --primary: #4A90E2;
+            --primary-dark: #357ABD;
+            --primary-light: #D9EEFF;
+            --secondary: #6C757D;
+            --success: #28A745;
+            --info: #17A2B8;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --text-primary: #343A40;
+            --text-secondary: #6C757D;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --border: #E0E0E0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
         }
 
-        .chat-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--info);
-            color: #fff;
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            padding-top: 60px;
+        }
+
+        .listing-container {
+            padding: 1rem 0.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .listing-header {
+            text-align: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .listing-header h1 {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .listing-header p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .overview-card {
+            background: var(--bg-primary);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: transform 0.2s ease;
+            border: 1px solid var(--border);
+        }
+        .overview-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .overview-card .icon-wrapper {
+            background: var(--primary-light);
             border-radius: 50%;
-            width: 65px;
-            height: 65px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-md);
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            z-index: 1040;
-            font-size: 1.8rem;
-            cursor: pointer;
-            border: 2px solid #333;
-            position: relative;
-        }
-
-        .chat-btn:hover {
-            transform: scale(1.15);
-            background: #2C7A7B;
-            border-color: #333;
-        }
-
-        .chat-notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--danger);
-            color: white;
-            border-radius: 50%;
-            padding: 0.3em 0.6em;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: none;
-            z-index: 1050;
-            border: 2px solid var(--bg-primary);
-            min-width: 25px;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .chat-box {
-            display: none;
-            position: fixed;
-            bottom: 110px;
-            right: 30px;
-            width: 380px;
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            max-height: 550px;
-            overflow: hidden;
-            z-index: 1040;
-            animation: fadeIn 0.3s ease-out;
-            border: 1px solid var(--border);
-            flex-direction: column;
-        }
-
-        .chat-box.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chat-header {
-            font-weight: 600;
+            font-size: 1.25rem;
             color: var(--primary-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background-color: var(--bg-primary);
-            border-top-left-radius: var(--radius-lg);
-            border-top-right-radius: var(--radius-lg);
         }
-
-        .chat-close-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        .chat-close-btn:hover {
-            color: var(--danger);
-        }
-
-        #conversationList {
-            padding: 0.8rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            max-height: 150px;
-            overflow-y: auto;
-            background-color: var(--bg-secondary);
-        }
-        #conversationList::-webkit-scrollbar {
-            width: 8px;
-        }
-        #conversationList::-webkit-scrollbar-track {
-            background: var(--border);
-            border-radius: 10px;
-        }
-        #conversationList::-webkit-scrollbar-thumb {
-            background: var(--secondary);
-            border-radius: 10px;
-        }
-
-        .conversation-item {
-            padding: 0.7rem 1rem;
-            cursor: pointer;
-            border-radius: var(--radius-md);
-            margin-bottom: 5px;
-            transition: background-color 0.2s ease;
-            font-size: 0.95rem;
+        .overview-card .card-content h4 {
+            margin: 0;
             color: var(--text-primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-weight: 700;
+            font-size: 1.125rem;
         }
-        .conversation-item:hover {
-            background-color: #e0e7ee;
-        }
-        .conversation-item.active-conversation {
-            background-color: var(--primary);
-            color: #fff;
-            font-weight: 600;
-        }
-        .conversation-item.active-conversation:hover {
-            background-color: var(--primary);
-        }
-        .conversation-item .last-message-preview {
-            font-size: 0.85rem;
+        .overview-card .card-content p {
+            margin: 0;
             color: var(--text-secondary);
-            max-width: 70%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: 0.75rem;
         }
-        .conversation-item.active-conversation .last-message-preview {
-            color: rgba(255, 255, 255, 0.8);
-        }
+        .overview-card.total-listings .icon-wrapper { color: #2196F3; }
+        .overview-card.available-listings .icon-wrapper { color: #4CAF50; }
+        .overview-card.sold-listings .icon-wrapper { color: #F44336; }
+        .overview-card.unread-messages .icon-wrapper { color: #1976D2; }
 
-        #chatMessages {
-            flex-grow: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            min-height: 150px;
-            background-color: var(--bg-primary);
-        }
-        #chatMessages::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chatMessages::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-            border-radius: 10px;
-        }
-        #chatMessages::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 10px;
-        }
-
-        .message {
-            margin-bottom: 0.75rem;
-            padding: 0.7rem 1rem;
+        .search-form {
+            background: var(--bg-primary);
+            padding: 1rem;
             border-radius: var(--radius-md);
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 0.9rem;
-            line-height: 1.4;
             box-shadow: var(--shadow-sm);
-        }
-
-        .message.sent {
-            background: var(--primary-light);
-            color: var(--text-primary);
-            margin-left: auto;
-            text-align: left;
-            border-bottom-right-radius: 5px;
-        }
-
-        .message.received {
-            background: var(--bg-secondary);
+            margin-bottom: 1rem;
             border: 1px solid var(--border);
-            color: var(--text-primary);
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
         }
-
-        .chat-form {
-            padding: 1rem 1.5rem 1.5rem;
-            border-top: 1px solid var(--border);
-            background-color: var(--bg-primary);
-            border-bottom-left-radius: var(--radius-lg);
-            border-bottom-right-radius: var(--radius-lg);
+        .search-form .form-control,
+        .search-form .form-select {
+            border-radius: var(--radius-sm);
+            border-color: var(--border);
+            padding: 0.5rem;
+            font-size: 0.875rem;
         }
-
-        #chatInput {
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-        }
-        #chatInput:focus {
-            box-shadow: 0 0 0 0.25rem rgba(var(--primary-dark), 0.25);
+        .search-form .form-control:focus,
+        .search-form .form-select:focus {
             border-color: var(--primary);
-            outline: none;
+            box-shadow: 0 0 0 0.15rem rgba(74, 144, 226, 0.2);
         }
-
-        .chat-form .btn {
-            border-radius: var(--radius-md);
+        .search-form .btn {
+            border-radius: var(--radius-sm);
             font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .search-form .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .search-form .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .search-form .btn-success {
             background-color: var(--success);
             border-color: var(--success);
-            padding: 0.75rem 1.25rem;
+        }
+        .search-form .btn-success:hover {
+            background-color: #218838;
+        }
+        .search-form .justify-content-end {
             margin-top: 0.75rem;
         }
-        .chat-form .btn:hover {
-            background-color: #0B9C6B;
-            border-color: #0B9C6B;
+
+        .empty-state {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .empty-state i {
+            color: var(--primary-light);
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+        .empty-state h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .empty-state p {
+            color: var(--text-secondary);
+            max-width: 450px;
+            margin: 0 auto 1rem;
+        }
+        .empty-state .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+        .empty-state .btn-primary:hover {
+            background-color: var(--primary-dark);
         }
 
         .card {
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-md);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: var(--bg-primary);
-            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px);
             box-shadow: var(--shadow-md);
         }
         .card-img-top {
-            height: 180px;
+            height: 160px;
             object-fit: cover;
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
         }
         .card-body {
-            padding: 1.5rem;
+            padding: 0.875rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
         .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
         .card-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        .card-text .fw-bold {
+            color: var(--primary);
         }
         .badge {
-            font-size: 0.75em;
-            font-weight: 600;
+            font-size: 0.625rem;
+            padding: 0.125rem 0.25rem;
+            border-radius: var(--radius-sm);
         }
-        .bg-success { background-color: var(--success); }
-        .bg-danger { background-color: var(--danger); }
-        .bg-warning { background-color: var(--warning); }
+        .mt-auto.d-flex.gap-2 {
+            gap: 0.5rem;
+            padding-top: 0.5rem;
+        }
+        .d-flex.gap-2 .btn {
+            padding: 0.375rem 0.625rem;
+            font-size: 0.75rem;
+        }
 
-        @media (max-width: 768px) {
-            .chat-box {
-                width: 95%;
-                right: 2.5%;
-                bottom: 100px;
-            }
-            .chat-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 55px;
-                height: 55px;
-                font-size: 1.5rem;
-            }
+        .chat-btn {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: var(--info);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease;
+            z-index: 1050;
+            font-size: 1.25rem;
+        }
+        .chat-btn:hover {
+            transform: scale(1.1);
+            background: #138496;
+        }
+
+        .chat-notification-badge {
+            top: -3px;
+            right: -3px;
+            padding: 0.125rem 0.25rem;
+            font-size: 0.625rem;
+            min-width: 14px;
+        }
+
+        .chat-box {
+            width: 300px;
+            max-height: 400px;
+            bottom: 70px;
+            right: 15px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        .chat-box.active {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        .chat-close-btn {
+            font-size: 0.875rem;
+        }
+
+        #conversationList {
+            max-height: 100px;
+            padding: 0.375rem;
+        }
+        .conversation-item {
+            padding: 0.25rem;
+            font-size: 0.75rem;
+        }
+        .conversation-item .last-message-preview {
+            font-size: 0.625rem;
+        }
+
+        #chatMessages {
+            padding: 0.5rem;
+            min-height: 150px;
+        }
+        .message {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .chat-form {
+            padding: 0.5rem;
+        }
+        #chatInput {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .modal-content {
+            border-radius: var(--radius-md);
+        }
+        .modal-header, .modal-body, .modal-footer {
+            padding: 0.75rem;
+        }
+        .modal-title {
+            font-size: 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .dashboard-overview { grid-template-columns: 1fr; }
+            .search-form .row { flex-direction: column; }
+            .search-form .col-12 { margin-top: 0.5rem; }
+            .card-img-top { height: 140px; }
+            .chat-box { width: 85%; right: 7.5%; bottom: 60px; }
+            .chat-btn { bottom: 10px; right: 10px; }
+        }
+        @media (max-width: 575px) {
+            .card-title { font-size: 0.875rem; }
+            .card-text { font-size: 0.7rem; }
+            .modal-dialog { margin: 0.5rem; }
         }
     </style>
 @endsection
@@ -315,81 +354,105 @@
 <div class="listing-container">
     <div class="container">
         <div class="listing-header">
-            <h1><i class="fas fa-home me-2"></i>Daftar Rumah Saya</h1>
-            <p class="text-muted">Kelola daftar properti Anda dengan mudah.</p>
+            <h1><i class="fas fa-home me-1"></i>Dasbor Agen Properti</h1>
+            <p class="text-muted">Kelola properti dan pantau kinerja.</p>
+        </div>
+
+        <div class="dashboard-overview">
+            <div class="overview-card total-listings">
+                <div class="icon-wrapper"><i class="bi bi-house-door-fill"></i></div>
+                <div class="card-content">
+                    <h4>{{ $totalHouses }}</h4>
+                    <p>Total Properti</p>
+                </div>
+            </div>
+            <div class="overview-card available-listings">
+                <div class="icon-wrapper"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="card-content">
+                    <h4>{{ $availableHouses }}</h4>
+                    <p>Properti Tersedia</p>
+                </div>
+            </div>
+            <div class="overview-card sold-listings">
+                <div class="icon-wrapper"><i class="bi bi-tag-fill"></i></div>
+                <div class="card-content">
+                    <h4>{{ $soldHouses }}</h4>
+                    <p>Properti Terjual</p>
+                </div>
+            </div>
+            <div class="overview-card unread-messages">
+                <div class="icon-wrapper"><i class="bi bi-chat-dots-fill"></i></div>
+                <div class="card-content">
+                    <h4 id="overviewUnreadMessages">0</h4>
+                    <p>Pesan Belum Dibaca</p>
+                </div>
+            </div>
         </div>
 
         <div class="search-form">
-            <form method="GET" action="{{ route('agent.index') }}" id="search-form" class="row g-3 align-items-end">
+            <form method="GET" action="{{ route('agent.index') }}" id="search-form" class="row g-2 align-items-end">
                 <div class="col-md-6 col-lg-5">
-                    <label for="search-input" class="form-label visually-hidden">Cari Judul Properti</label>
-                    <input type="text" name="search" id="search-input" class="form-control" placeholder="Cari berdasarkan judul properti..."
+                    <label for="search-input" class="visually-hidden">Cari Judul</label>
+                    <input type="text" name="search" id="search-input" class="form-control" placeholder="Cari judul..."
                            value="{{ $search ?? '' }}" aria-label="Cari daftar rumah">
                 </div>
                 <div class="col-md-3 col-lg-3">
-                    <label for="sort-by-select" class="form-label visually-hidden">Urutkan Berdasarkan</label>
-                    <select name="sort_by" id="sort-by-select" class="form-select" aria-label="Urutkan berdasarkan">
+                    <label for="sort-by-select" class="visually-hidden">Urutkan</label>
+                    <select name="sort_by" id="sort-by-select" class="form-select">
                         <option value="price" {{ $sortBy === 'price' ? 'selected' : '' }}>Harga</option>
                         <option value="title" {{ $sortBy === 'title' ? 'selected' : '' }}>Judul</option>
                         <option value="status" {{ $sortBy === 'status' ? 'selected' : '' }}>Status</option>
-                        <option value="created_at" {{ $sortBy === 'created_at' ? 'selected' : '' }}>Tanggal Ditambahkan</option>
+                        <option value="created_at" {{ $sortBy === 'created_at' ? 'selected' : '' }}>Tanggal</option>
                     </select>
                 </div>
                 <div class="col-md-3 col-lg-2">
-                    <label for="sort-order-select" class="form-label visually-hidden">Urutan</label>
-                    <select name="sort_order" id="sort-order-select" class="form-select" aria-label="Urutan pengurutan">
+                    <label for="sort-order-select" class="visually-hidden">Urutan</label>
+                    <select name="sort_order" id="sort-order-select" class="form-select">
                         <option value="asc" {{ $sortOrder === 'asc' ? 'selected' : '' }}>Naik</option>
                         <option value="desc" {{ $sortOrder === 'desc' ? 'selected' : '' }}>Turun</option>
                     </select>
                 </div>
-                <div class="col-12 col-lg-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1" id="search-btn">
-                        <i class="fas fa-search me-2"></i>Cari
+                <div class="col-12 col-lg-2">
+                    <button type="submit" class="btn btn-primary w-100" id="search-btn">
+                        <i class="fas fa-search me-1"></i>Cari
                     </button>
                 </div>
             </form>
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end mt-1">
                 <a href="{{ route('agent.create') }}" class="btn btn-success">
-                    <i class="fas fa-plus-circle me-2"></i>Tambah Rumah Baru
+                    <i class="fas fa-plus-circle me-1"></i>Tambah Properti
                 </a>
             </div>
         </div>
 
         @if ($houses->isEmpty())
             <div class="empty-state">
-                <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
-                <h3>Ups! Tidak Ada Daftar Rumah Ditemukan</h3>
-                <p>Sepertinya Anda belum menambahkan properti. Mulai dengan menambahkan rumah baru ke portofolio Anda sekarang!</p>
-                <a href="{{ route('agent.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus-circle me-2"></i>Tambah Rumah Baru
-                </a>
+                <i class="bi bi-house-exclamation"></i>
+                <h3>Tidak Ada Properti</h3>
+                <p>Belum ada properti. Tambahkan sekarang!</p>
+                <a href="{{ route('agent.create') }}" class="btn btn-primary">Tambah</a>
             </div>
         @else
-            <div class="row" id="listing-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2" id="listing-grid">
                 @foreach ($houses as $house)
-                    <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="col">
                         <div class="card h-100" data-house-id="{{ $house->id }}">
                             @php
                                 $pathToCheck = ltrim(str_replace('public/', '', $house->photo_path), '/');
-                                $fileExists = $house->photo_path ? Storage::disk('public')->exists($pathToCheck) : false;
-                                $imageUrl = $fileExists ? Storage::url($pathToCheck) : 'https://via.placeholder.com/400x220?text=Gambar+Tidak+Tersedia';
+                                $imageUrl = Storage::disk('public')->exists($pathToCheck) ? Storage::url($pathToCheck) : 'https://via.placeholder.com/400x220';
                             @endphp
-                            <img src="{{ $imageUrl }}" class="card-img-top lazy" alt="{{ $house->title }}" loading="lazy">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ Str::limit($house->title, 30) }}</h5>
-                                <p class="card-text">Harga: <span class="fw-bold text-primary">Rp {{ number_format($house->price, 0, ',', '.') }}</span></p>
-                                <p class="card-text">Status:
-                                    <span class="badge {{ $house->status === 'Tersedia' ? 'bg-success' : ($house->status === 'Terjual' ? 'bg-danger' : 'bg-warning') }}">
-                                        {{ $house->status }}
-                                    </span>
-                                </p>
+                            <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $house->title }}" loading="lazy">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ Str::limit($house->title, 20) }}</h5>
+                                <p class="card-text">Harga: <span class="fw-bold">{{ number_format($house->price, 0, ',', '.') }}</span></p>
+                                <p class="card-text">Status: <span class="badge {{ $house->status === 'Tersedia' ? 'bg-success' : 'bg-danger' }}">{{ $house->status }}</span></p>
                                 <div class="mt-auto d-flex gap-2">
-                                    <a href="{{ route('agent.edit', $house) }}" class="btn btn-primary btn-sm flex-grow-1" aria-label="Edit {{ $house->title }}">
-                                        <i class="fas fa-edit me-1"></i>Edit
+                                    <a href="{{ route('agent.edit', $house) }}" class="btn btn-primary btn-sm flex-grow-1">
+                                        <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <button class="btn btn-danger btn-sm flex-grow-1 delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-house-id="{{ $house->id }}" data-house-title="{{ $house->title }}" aria-label="Hapus {{ $house->title }}">
-                                        <i class="fas fa-trash me-1"></i>Hapus
+                                            data-house-id="{{ $house->id }}" data-house-title="{{ $house->title }}">
+                                        <i class="fas fa-trash"></i> Hapus
                                     </button>
                                 </div>
                             </div>
@@ -397,8 +460,7 @@
                     </div>
                 @endforeach
             </div>
-
-            <div class="d-flex justify-content-center mt-5">
+            <div class="d-flex justify-content-center mt-2">
                 {{ $houses->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
             </div>
         @endif
@@ -409,20 +471,18 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Konfirmasi Penghapusan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle text-warning me-1"></i>Konfirmasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body">
-                Apakah Anda yakin ingin menghapus properti <strong id="house-title"></strong>? Tindakan ini tidak dapat dibatalkan.
+                Hapus <strong id="house-title"></strong>? Tindakan ini permanen.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <form id="delete-form" method="POST" action="">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash-alt me-1"></i>Hapus Permanen
-                    </button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
                 </form>
             </div>
         </div>
@@ -436,20 +496,18 @@
 
 <div class="chat-box" id="chatBox">
     <div class="chat-header">
-        <span id="chatTitle">Live Chat dengan Pembeli</span>
-        <button class="chat-close-btn" onclick="toggleChat()"><i class="bi bi-x-lg"></i></button>
+        <span id="chatTitle">Live Chat</span>
+        <button class="chat-close-btn" onclick="toggleChat"><i class="bi bi-x-lg"></i></button>
     </div>
-
     <div id="conversationList">
         @forelse ($conversations as $conversation)
             <div class="conversation-item {{ request()->query('conversation_id') == $conversation->id ? 'active-conversation' : '' }}"
-                 data-conversation-id="{{ $conversation->id }}"
-                 data-buyer-name="{{ $conversation->buyer->name }}">
+                 data-conversation-id="{{ $conversation->id }}" data-buyer-name="{{ $conversation->buyer->name }}">
                 <div>
-                    <strong>{{ Str::limit($conversation->buyer->name, 20) }}</strong>
+                    <strong>{{ Str::limit($conversation->buyer->name, 12) }}</strong>
                     <div class="last-message-preview">
                         @if ($conversation->messages->isNotEmpty())
-                            {{ Str::limit($conversation->messages->first()->message_text, 30) }}
+                            {{ Str::limit($conversation->messages->first()->message_text, 20) }}
                         @else
                             Belum ada pesan
                         @endif
@@ -460,32 +518,29 @@
                 @endif
             </div>
         @empty
-            <div class="text-center py-3 text-muted" id="noConversations">Tidak ada percakapan baru.</div>
+            <div class="text-center py-1 text-muted" id="noConversations">Tidak ada percakapan.</div>
         @endforelse
     </div>
-
     <div id="chatMessages">
-        <div class="text-center py-3 text-muted" id="selectConversationPrompt">Pilih percakapan untuk memulai chat.</div>
+        <div class="text-center py-1 text-muted" id="selectConversationPrompt">Pilih percakapan.</div>
     </div>
-
     <form id="chatForm" class="chat-form">
-        <input type="text" id="chatInput" class="form-control mb-2" placeholder="Ketik pesan Anda di sini..." required autocomplete="off" disabled>
-        <button type="submit" class="btn btn-success w-100" id="sendMessageBtn" disabled>Kirim Pesan</button>
+        <input type="text" id="chatInput" class="form-control mb-1" placeholder="Tulis pesan..." required autocomplete="off" disabled>
+        <button type="submit" class="btn btn-primary w-100" id="sendMessageBtn" disabled>Kirim</button>
     </form>
 </div>
 @endsection
 
 @section('scripts')
     <script>
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const houseId = this.dataset.houseId;
-                const houseTitle = this.dataset.houseTitle;
-                const form = document.getElementById('delete-form');
-                const titleElement = document.getElementById('house-title');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-                form.action = `/agent/houses/${houseId}`;
-                titleElement.textContent = houseTitle;
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const houseId = button.dataset.houseId;
+                const houseTitle = button.dataset.houseTitle;
+                document.getElementById('delete-form').action = `/agent/houses/${houseId}`;
+                document.getElementById('house-title').textContent = houseTitle;
             });
         });
 
@@ -493,17 +548,11 @@
         const searchForm = document.getElementById('search-form');
         const searchBtn = document.getElementById('search-btn');
 
-        searchBtn.disabled = false;
-        searchBtn.classList.remove('btn-secondary');
-        searchBtn.classList.add('btn-primary');
-
-        searchInput.addEventListener('input', function () {
-            searchBtn.disabled = false;
-            searchBtn.classList.remove('btn-secondary');
-            searchBtn.classList.add('btn-primary');
+        searchInput.addEventListener('input', () => {
+            searchBtn.disabled = !searchInput.value.trim();
         });
 
-        searchForm.addEventListener('submit', function () {
+        searchForm.addEventListener('submit', () => {
             searchBtn.disabled = true;
             searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
         });
@@ -518,241 +567,149 @@
         const chatTitle = document.getElementById('chatTitle');
         const selectConversationPrompt = document.getElementById('selectConversationPrompt');
         const chatNotificationBadge = document.getElementById('chatNotificationBadge');
+        const overviewUnreadMessages = document.getElementById('overviewUnreadMessages');
+
         let currentConversationId = null;
         let currentBuyerName = null;
         let pollingInterval;
-        let lastMessageId = 0;
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         function toggleChat() {
             chatVisible = !chatVisible;
             chatBox.classList.toggle('active');
-
             if (chatVisible) {
                 currentConversationId = null;
                 currentBuyerName = null;
-                lastMessageId = 0;
-                chatMessages.innerHTML = '<div class="text-center py-3 text-muted" id="selectConversationPrompt">Pilih percakapan untuk memulai chat.</div>';
-                chatInput.value = '';
+                chatMessages.innerHTML = '<div class="text-center py-1 text-muted" id="selectConversationPrompt">Pilih percakapan.</div>';
                 chatInput.disabled = true;
                 sendMessageBtn.disabled = true;
-                chatTitle.textContent = 'Live Chat dengan Pembeli';
-                selectConversationPrompt.style.display = 'block';
-                updateNotificationBadge();
+                chatTitle.textContent = 'Live Chat';
+                fetchConversations();
                 pollingInterval = setInterval(() => {
                     fetchConversations();
-                    if (currentConversationId) {
-                        fetchMessages(currentConversationId);
-                    }
+                    if (currentConversationId) fetchMessages(currentConversationId);
                 }, 3000);
             } else {
                 clearInterval(pollingInterval);
-                updateNotificationBadge();
             }
+            updateNotificationBadge();
         }
 
-        function updateNotificationBadge() {
-            let totalUnread = 0;
-            document.querySelectorAll('.conversation-item .badge.bg-danger').forEach(badge => {
-                totalUnread += parseInt(badge.textContent);
-            });
+        function updateNotificationBadge(totalUnread = null) {
+            if (totalUnread === null) {
+                totalUnread = Array.from(document.querySelectorAll('.conversation-item .badge.bg-danger')).reduce((sum, badge) => sum + (parseInt(badge.textContent) || 0), 0);
+            }
             chatNotificationBadge.textContent = totalUnread;
             chatNotificationBadge.style.display = totalUnread > 0 ? 'block' : 'none';
+            overviewUnreadMessages.textContent = totalUnread;
         }
 
         async function fetchConversations() {
             try {
-                const response = await fetch('/agent/conversations', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch('/agent/conversations', { headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } });
                 const data = await response.json();
                 conversationList.innerHTML = '';
-                let totalUnreadCount = 0;
-
-                if (data.conversations && data.conversations.length > 0) {
+                let totalUnread = 0;
+                if (data.conversations?.length) {
                     data.conversations.forEach(conv => {
-                        totalUnreadCount += conv.unread_count;
-                        const conversationItem = document.createElement('div');
-                        conversationItem.classList.add('conversation-item');
-                        if (currentConversationId === conv.id) {
-                            conversationItem.classList.add('active-conversation');
-                        }
-                        conversationItem.dataset.conversationId = conv.id;
-                        conversationItem.dataset.buyerName = conv.buyer_name || 'Pembeli Tak Dikenal';
-
-                        let lastMessagePreview = conv.last_message ? conv.last_message.message_text : 'Belum ada pesan';
-                        if (lastMessagePreview.length > 30) {
-                            lastMessagePreview = lastMessagePreview.substring(0, 27) + '...';
-                        }
-
-                        conversationItem.innerHTML = `
-                            <div>
-                                <strong>${conv.buyer_name || 'Pembeli'}</strong>
-                                <div class="last-message-preview">${lastMessagePreview}</div>
-                            </div>
-                            ${conv.unread_count > 0 ? `<span class="badge bg-danger">${conv.unread_count}</span>` : ''}
-                        `;
-                        conversationItem.addEventListener('click', () => selectConversation(conv.id, conv.buyer_name));
-                        conversationList.appendChild(conversationItem);
+                        totalUnread += conv.unread_count || 0;
+                        const item = document.createElement('div');
+                        item.classList.add('conversation-item', currentConversationId === conv.id ? 'active-conversation' : '');
+                        item.dataset.conversationId = conv.id;
+                        item.dataset.buyerName = conv.buyer_name || 'Pembeli';
+                        item.innerHTML = `<div><strong>${conv.buyer_name || 'Pembeli'}</strong><div class="last-message-preview">${conv.last_message?.message_text?.slice(0, 20) || 'Belum ada pesan'}${conv.last_message?.message_text?.length > 20 ? '...' : ''}</div></div>${conv.unread_count > 0 ? `<span class="badge bg-danger">${conv.unread_count}</span>` : ''}`;
+                        item.addEventListener('click', () => selectConversation(conv.id, conv.buyer_name));
+                        conversationList.appendChild(item);
                     });
-                    document.getElementById('noConversations').style.display = 'none';
                 } else {
-                    document.getElementById('noConversations').style.display = 'block';
+                    conversationList.innerHTML = '<div class="text-center py-1 text-muted" id="noConversations">Tidak ada percakapan.</div>';
                 }
-
-                updateNotificationBadge(totalUnreadCount);
-            } catch (error) {
-                console.error("Error fetching conversations:", error);
-                document.getElementById('noConversations').style.display = 'block';
-                document.getElementById('noConversations').textContent = 'Gagal memuat percakapan.';
+                updateNotificationBadge(totalUnread);
+            } catch (e) {
+                console.error('Error:', e);
+                conversationList.innerHTML = '<div class="text-center py-1 text-muted" id="noConversations">Gagal memuat.</div>';
             }
         }
 
         async function selectConversation(conversationId, buyerName) {
             if (currentConversationId === conversationId) return;
-
             document.querySelectorAll('.conversation-item').forEach(item => item.classList.remove('active-conversation'));
-            const selectedConv = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
-            if (selectedConv) {
-                selectedConv.classList.add('active-conversation');
-            }
-
+            document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`).classList.add('active-conversation');
             currentConversationId = conversationId;
             currentBuyerName = buyerName;
-            lastMessageId = 0;
             chatMessages.innerHTML = '';
             chatInput.disabled = false;
             sendMessageBtn.disabled = false;
-            chatTitle.textContent = `Chat dengan ${buyerName}`;
+            chatTitle.textContent = `Obrolan dengan ${buyerName}`;
             selectConversationPrompt.style.display = 'none';
-            fetchMessages(conversationId);
+            await fetchMessages(conversationId);
             chatInput.focus();
+            markConversationAsRead(conversationId);
         }
 
-        function appendMessage(message, isSentByMe) {
-            const newMessageDiv = document.createElement('div');
-            newMessageDiv.classList.add('message');
-            newMessageDiv.classList.add(isSentByMe ? 'sent' : 'received');
-            newMessageDiv.innerHTML = isSentByMe
-                ? `<strong>Anda:</strong> ${message.message_text}`
-                : `<strong>${message.sender_name || 'Pembeli'}:</strong> ${message.message_text}`;
-            chatMessages.appendChild(newMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            if (message.id > lastMessageId) {
-                lastMessageId = message.id;
+        async function markConversationAsRead(conversationId) {
+            try {
+                await fetch(`/agent/conversations/${conversationId}/mark-as-read`, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken } });
+            } catch (e) {
+                console.error('Error:', e);
             }
         }
 
+        function appendMessage(message, isSentByMe) {
+            const div = document.createElement('div');
+            div.classList.add('message', isSentByMe ? 'sent' : 'received');
+            div.innerHTML = `<strong>${isSentByMe ? 'Anda' : message.sender_name || 'Pembeli'}:</strong> ${message.message_text}`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
         async function fetchMessages(conversationId) {
-            if (!conversationId) return;
-
             try {
-                const response = await fetch(`/agent/chat/messages/${conversationId}?last_message_id=${lastMessageId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch(`/agent/chat/messages/${conversationId}`, { headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } });
                 const data = await response.json();
-                selectConversationPrompt.style.display = 'none';
-                data.messages.forEach(msg => {
-                    const isSentByMe = msg.sender_type === 'agent' && msg.sender_id === currentUserId;
-                    appendMessage(msg, isSentByMe);
-                });
-
-                const activeItem = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
-                if (activeItem) {
-                    const unreadBadge = activeItem.querySelector('.badge.bg-danger');
-                    if (unreadBadge) {
-                        unreadBadge.remove();
-                        updateNotificationBadge();
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-                chatMessages.innerHTML = '<div class="text-center py-3 text-danger">Gagal memuat pesan.</div>';
+                data.messages?.forEach(msg => appendMessage(msg, msg.sender_type === 'agent' && msg.sender_id === currentUserId));
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (e) {
+                console.error('Error:', e);
+                chatMessages.innerHTML = '<div class="text-center py-1 text-danger">Gagal memuat.</div>';
             }
         }
 
         async function sendMessage(messageText) {
-            if (!currentConversationId) {
-                alert('Pilih percakapan terlebih dahulu.');
-                return;
-            }
-
+            if (!currentConversationId) return alert('Pilih percakapan terlebih dahulu.');
             try {
                 sendMessageBtn.disabled = true;
-                sendMessageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kirim...';
-
-                const payload = { message_text: messageText };
-
+                sendMessageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 const response = await fetch(`/agent/chat/send/${currentConversationId}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(payload)
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_text: messageText })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
                 const data = await response.json();
                 appendMessage(data.sent_message, true);
                 chatInput.value = '';
-                chatInput.focus();
-
                 const activeItem = document.querySelector(`.conversation-item[data-conversation-id="${currentConversationId}"]`);
                 if (activeItem) {
-                    const preview = activeItem.querySelector('.last-message-preview');
-                    preview.textContent = messageText.length > 30 ? messageText.substring(0, 27) + '...' : messageText;
+                    activeItem.querySelector('.last-message-preview').textContent = messageText.length > 20 ? messageText.slice(0, 17) + '...' : messageText;
+                    conversationList.prepend(activeItem);
                 }
-            } catch (error) {
-                console.error("Error sending message:", error);
-                alert('Gagal mengirim pesan: ' + error.message);
+            } catch (e) {
+                console.error('Error:', e);
+                alert('Gagal: ' + e.message);
             } finally {
                 sendMessageBtn.disabled = false;
-                sendMessageBtn.innerHTML = 'Kirim Pesan';
+                sendMessageBtn.innerHTML = 'Kirim';
             }
         }
 
-        conversationList.addEventListener('click', function(e) {
-            const conversationItem = e.target.closest('.conversation-item');
-            if (conversationItem) {
-                const conversationId = conversationItem.dataset.conversationId;
-                const buyerName = conversationItem.dataset.buyerName;
-                selectConversation(conversationId, buyerName);
-            }
+        conversationList.addEventListener('click', e => {
+            const item = e.target.closest('.conversation-item');
+            if (item) selectConversation(item.dataset.conversationId, item.dataset.buyerName);
         });
 
-        chatForm.addEventListener('submit', function(e) {
+        chatForm.addEventListener('submit', e => {
             e.preventDefault();
             const message = chatInput.value.trim();
-            if (message) {
-                sendMessage(message);
-            }
+            if (message) sendMessage(message);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -760,9 +717,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             const conversationId = urlParams.get('conversation_id');
             if (conversationId) {
-                const conversationItem = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
-                if (conversationItem) {
-                    conversationItem.click();
+                const item = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
+                if (item) {
+                    item.click();
                     chatVisible = true;
                     chatBox.classList.add('active');
                 }
